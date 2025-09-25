@@ -1,0 +1,159 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Intersection {
+  id        String   @id @default(cuid())
+  name      String
+  location  Json     // { lat: number, lng: number }
+  approaches Json    // Array of approach definitions
+  configJson Json    // Intersection-specific configuration
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  signalPhases   SignalPhase[]
+  detections     Detection[]
+  signalStates   SignalState[]
+  events         Event[]
+  preemptions    Preemption[]
+
+  @@map("intersections")
+}
+
+model SignalPhase {
+  id                String @id @default(cuid())
+  intersectionId    String
+  name              String
+  allowedApproaches Json   // Array of approach IDs
+  minGreen          Int    // Minimum green time in seconds
+  maxGreen          Int    // Maximum green time in seconds
+  yellow            Int    // Yellow time in seconds
+  allRed            Int    // All red time in seconds
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  intersection Intersection @relation(fields: [intersectionId], references: [id], onDelete: Cascade)
+  signalStates SignalState[]
+
+  @@map("signal_phases")
+}
+
+model Detection {
+  id             String   @id @default(cuid())
+  intersectionId String
+  approachId     String
+  timestamp      DateTime
+  countsJson     Json     // Vehicle counts by type
+  queueLengthM   Float    // Queue length in meters
+  avgWaitS       Float    // Average wait time in seconds
+  fps            Float    // Frames per second
+  latencyMs      Int      // Processing latency in milliseconds
+  emergencyFlag  Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  // Relations
+  intersection Intersection @relation(fields: [intersectionId], references: [id], onDelete: Cascade)
+
+  @@index([intersectionId, timestamp])
+  @@index([timestamp])
+  @@index([emergencyFlag])
+  @@map("detections")
+}
+
+model SignalState {
+  id             String   @id @default(cuid())
+  intersectionId String
+  timestamp      DateTime
+  phaseId        String
+  remainingS     Int      // Remaining time in current phase
+  mode           SignalMode
+  source         String   // Controller source (rl, heuristic, fixed, manual)
+  createdAt      DateTime @default(now())
+
+  // Relations
+  intersection Intersection @relation(fields: [intersectionId], references: [id], onDelete: Cascade)
+  phase        SignalPhase  @relation(fields: [phaseId], references: [id])
+
+  @@index([intersectionId, timestamp])
+  @@index([timestamp])
+  @@map("signal_states")
+}
+
+model Event {
+  id             String   @id @default(cuid())
+  intersectionId String
+  timestamp      DateTime
+  type           String   // Event type (alert, warning, info, error)
+  payloadJson    Json     // Event-specific data
+  createdAt      DateTime @default(now())
+
+  // Relations
+  intersection Intersection @relation(fields: [intersectionId], references: [id], onDelete: Cascade)
+
+  @@index([intersectionId, timestamp])
+  @@index([type, timestamp])
+  @@map("events")
+}
+
+model Preemption {
+  id             String    @id @default(cuid())
+  intersectionId String
+  timestamp      DateTime
+  direction      String    // Direction of emergency vehicle
+  reason         String    // Reason for preemption (ambulance, fire, police)
+  durationS      Int       // Preemption duration in seconds
+  resolvedTs     DateTime? // When preemption was resolved
+  createdAt      DateTime  @default(now())
+
+  // Relations
+  intersection Intersection @relation(fields: [intersectionId], references: [id], onDelete: Cascade)
+
+  @@index([intersectionId, timestamp])
+  @@index([resolvedTs])
+  @@map("preemptions")
+}
+
+// User management for dashboard access
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String   // Hashed password
+  role      UserRole @default(OPERATOR)
+  firstName String?
+  lastName  String?
+  isActive  Boolean  @default(true)
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+// Enums
+enum SignalMode {
+  AUTO      // RL-based adaptive control
+  HEURISTIC // Max-pressure heuristic
+  FIXED     // Fixed-timer control
+  MANUAL    // Manual operator control
+
+  @@map("signal_mode")
+}
+
+enum UserRole {
+  ADMIN     // Full system access
+  OPERATOR  // Traffic operations
+  VIEWER    // Read-only access
+
+  @@map("user_role")
+}
