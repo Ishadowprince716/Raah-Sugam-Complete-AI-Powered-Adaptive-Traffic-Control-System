@@ -25,7 +25,8 @@ Project Raah-Sugam is a production-ready, AI-powered adaptive traffic signal con
 - **Production Ready**: Docker containers, observability, security, and comprehensive testing
 
 ## 🏗️ Architecture
-![Uploading d095978d-8bb5-41b0-83ff-843a4fdd132e.jpg…]()
+<img width="793" height="794" alt="Screenshot 2025-09-25 230410" src="https://github.com/user-attachments/assets/eef2f291-bb71-4e18-a67f-c5f619533c04" />
+
 
 
 
