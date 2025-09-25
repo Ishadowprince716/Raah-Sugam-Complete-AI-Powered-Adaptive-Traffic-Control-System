@@ -209,8 +209,8 @@ Project Raah-Sugam aims to:
 
 For questions, support, or collaboration opportunities:
 - Create an issue in this repository
-- Email: raah.sugam.team@gmail.com
-- Demo Video: [YouTube Link]
+- Email: patelmrrahul199@gmail.com
+- Moblile no: +917581982880
 
 ---
 
