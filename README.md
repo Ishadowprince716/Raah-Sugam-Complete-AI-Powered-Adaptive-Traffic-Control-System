@@ -25,18 +25,9 @@ Project Raah-Sugam is a production-ready, AI-powered adaptive traffic signal con
 - **Production Ready**: Docker containers, observability, security, and comprehensive testing
 
 ## 🏗️ Architecture
+![Uploading d095978d-8bb5-41b0-83ff-843a4fdd132e.jpg…]()
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Edge Layer    │    │  Backend Layer  │    │Dashboard Layer  │
-│  (Jetson Nano)  │    │  (Node.js API)  │    │ (React + TS)    │
-├─────────────────┤    ├─────────────────┤    ├─────────────────┤
-│ • YOLOv8 Detect │◄──►│ • REST APIs     │◄──►│ • Live Traffic  │
-│ • RL Controller │    │ • WebSocket Hub │    │ • Real-time     │
-│ • Emergency Det │    │ • PostgreSQL DB │    │ • Analytics     │
-│ • Telemetry     │    │ • Auth & Security│    │ • Controls      │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
+
 
 ## 🚀 Quick Start
 
